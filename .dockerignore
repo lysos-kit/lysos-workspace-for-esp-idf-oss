@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+build/
+sdkconfig
+sdkconfig.old
+*.bin
+*.elf
+*.map
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+*.egg
+
+# Dependencies
+managed_components/
+dependencies.lock
+
+# Logs
+*.log
+
+# Documentation build
+docs/_build/
+
+# CI/CD
+.github/
+
+# Misc
+*.bak
+*.tmp
+.cache/
+

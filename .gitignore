@@ -1,41 +1,65 @@
-# Prerequisites
-*.d
+# ESP-IDF Build System
+build/
+sdkconfig
+sdkconfig.old
+*.bin
+*.elf
+*.map
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Environment files (DO NOT commit .env with secrets!)
+.env
+.env.local
+.env.*.local
+# Keep .env.example for reference
+!.env.example
 
-# Precompiled Headers
-*.gch
-*.pch
+# Managed components and dependencies
+managed_components/
+dependencies.lock
 
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 *.so
-*.dylib
-*.dll
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+*.egg
 
-# Fortran module files
-*.mod
-*.smod
+# IDE and Editor files
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Logs
+*.log
 
-# Executables
-*.exe
-*.out
-*.app
+# Cache
+.cache/
+.ccache/
 
-# debug information files
-*.dwo
+# Documentation build
+docs/_build/
+
+# OS specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Docker volumes (if running locally)
+.docker-volumes/

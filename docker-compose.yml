@@ -1,0 +1,89 @@
+
+services:
+  esp-idf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    image: esp32-starter-idf:v5.5.1
+    container_name: esp32-dev
+    
+    # Mount project directory
+    volumes:
+      - .:/workspace
+      - espidf-cargo-cache:/root/.cargo
+      - espidf-ccache-cache:/root/.ccache
+    
+    # Serial port device passthrough (for WSL2 and Linux)
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/ttyACM1:/dev/ttyACM1
+    
+    # Privileged mode for device access (required for WSL2)
+    privileged: true
+    
+    # Interactive terminal
+    stdin_open: true
+    tty: true
+    
+    # Working directory inside container
+    working_dir: /workspace
+    
+    # Environment variables from .env file
+    environment:
+      # ESP-IDF Target Configuration
+      - IDF_TARGET=${IDF_TARGET:-esp32s3}
+      
+      # Serial Port Configuration
+      - ESPPORT=${ESPPORT:-/dev/ttyUSB0}
+      - ESPBAUD=${ESPBAUD:-115200}
+      - MONITORBAUD=${MONITORBAUD:-115200}
+      
+      # Build Configuration
+      - IDF_CCACHE_ENABLE=${IDF_CCACHE_ENABLE:-1}
+      - CCACHE_DIR=${CCACHE_DIR:-/root/.ccache}
+      - CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE:-Release}
+      - IDF_BUILD_PARALLEL=${IDF_BUILD_PARALLEL:-}
+      
+      # Flash Configuration
+      - ESPFLASHMODE=${ESPFLASHMODE:-dio}
+      - ESPFLASHFREQ=${ESPFLASHFREQ:-80m}
+      - ESPFLASHSIZE=${ESPFLASHSIZE:-detect}
+      
+      # Monitor Configuration
+      - IDF_MONITOR_DECODE=${IDF_MONITOR_DECODE:-1}
+      - IDF_MONITOR_BAUD=${IDF_MONITOR_BAUD:-115200}
+      
+      # Debug Configuration
+      - OPENOCD_COMMANDS=${OPENOCD_COMMANDS:-}
+      - OPENOCD_DEBUG_LEVEL=${OPENOCD_DEBUG_LEVEL:-}
+      
+      # Python Configuration
+      - IDF_PYTHON_ENV_PATH=${IDF_PYTHON_ENV_PATH:-}
+      
+      # Component Configuration
+      - EXTRA_COMPONENT_DIRS=${EXTRA_COMPONENT_DIRS:-}
+      
+      # Optimization Flags
+      - CFLAGS=${CFLAGS:-}
+      - CXXFLAGS=${CXXFLAGS:-}
+      - LDFLAGS=${LDFLAGS:-}
+      
+      # Security
+      - SECURE_BOOT_SIGNING_KEY=${SECURE_BOOT_SIGNING_KEY:-}
+      - SECURE_BOOT_ENCRYPTION_KEY=${SECURE_BOOT_ENCRYPTION_KEY:-}
+    
+    # Network mode (useful for debugging and OTA)
+    network_mode: bridge
+    
+    # User context
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+
+volumes:
+  espidf-cargo-cache:
+  espidf-ccache-cache:
+
