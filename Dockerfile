@@ -18,14 +18,8 @@ RUN apt-get update && apt-get install -y \
 # Set up working directory
 WORKDIR /workspace
 
-# Create non-root user for development (optional but recommended for security)
-ARG USER_ID=1000
-ARG GROUP_ID=1000
-RUN groupadd -g ${GROUP_ID} espuser || true && \
-    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash espuser || true
-
-# Ensure the workspace directory is writable
-RUN chown -R ${USER_ID}:${GROUP_ID} /workspace || true
+# Set up ESP-IDF environment for root user (for interactive shells)
+RUN echo '. /opt/esp/idf/export.sh > /dev/null 2>&1' >> /root/.bashrc
 
 # Keep container running and allow interactive shell
 CMD ["/bin/bash"]
