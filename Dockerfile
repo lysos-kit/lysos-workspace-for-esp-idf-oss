@@ -1,5 +1,8 @@
-# ESP-IDF v5.5.1 Development Environment
-FROM espressif/idf:v5.5.1
+# ESP-IDF Development Environment
+ARG ESPIDF_IMAGE_VERSION=v5.5.1
+FROM espressif/idf:${ESPIDF_IMAGE_VERSION}
+
+RUN echo "Using ESP-IDF version ${ESPIDF_IMAGE_VERSION}"
 
 # Install additional useful tools
 RUN apt-get update && apt-get install -y \

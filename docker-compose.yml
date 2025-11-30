@@ -7,7 +7,8 @@ services:
       args:
         USER_ID: ${USER_ID:-1000}
         GROUP_ID: ${GROUP_ID:-1000}
-    image: esp32-starter-idf:v5.5.1
+        ESPIDF_IMAGE_VERSION: ${ESPIDF_IMAGE_VERSION:-v5.5.1}
+    image: esp32-starter-idf:${ESPIDF_IMAGE_VERSION:-v5.5.1}
     container_name: esp32-dev
     
     # Mount project directory
