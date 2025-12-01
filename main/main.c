@@ -1,7 +1,7 @@
 /**
  * ESP32 Starter Project
  * 
- * A clean, production-ready ESP32-S3 firmware starter.
+ * A clean, production-ready ESP32 firmware starter.
  * This example demonstrates basic functionality and best practices.
  */
 
