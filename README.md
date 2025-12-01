@@ -1,66 +1,79 @@
-# Lysos ESP32 Starter
+# Lysos Workspace for ESP-IDF
 
-A clean, production-ready template for ESP32S3 projects.  
-This starter gives you a correct folder structure, safe defaults, and a working build without trial and error.
+A clean, isolated ESP-IDF environment built for professional firmware teams. It removes setup pain, dependency conflicts, and version issues. Drop in your project, choose the IDF version, and everything just works.
 
-## Why This Exists TODO
+## Why Use This Workspace?
 
-Most ESP32 examples online are:
-
-- Hobby-focused
-- Outdated
-- Missing production requirements
-- Full of blocking calls and unsafe patterns
-
-This template gives you:
-
-- Safe partition table
-- Clean main loop
-- Logging ready to go
-- OTA hooks
-- Example services
-- Production-ready flags
-
-## Features TODO
-
-- Working ESP-IDF project out of the box
-- Minimal folder structure
-- Safe stack sizes + task config
-- Logging pre-configured
-- OTA update hooks prepared
-- Compatible with Lysos IoT OS and Lysos SIM7080 Adapter
+- **No Python Conflicts**: ESP-IDF runs in an isolated Docker container
+- **Version Locked**: Pin specific ESP-IDF versions per project
+- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **USB Passthrough**: Full hardware debugging and flashing support
+- **Production Ready**: Includes safe defaults and best practices
 
 ## Quick Start
 
-```
-TODO
+### 1. Set Up
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Copy your ESP-IDF project folder into project-root-folder
+cp -r /path/to/your/my-esp32-project ./project-root-folder/
+
+# Edit .env to set your project folder name
+nano .env  # Set: PROJECT_NAME=my-esp32-project
 ```
 
-You should see:
+### 2. Start Docker Environment
 
-```
-[Lysos] Boot OK
-[Lysos] System ready
-```
+```bash
+# Build and start the container
+docker compose up -d
 
-## Folder Structure TODO
-
-```
-/main
-  main.cpp
-  config.h
-  logging.cpp
-  services/
-/components
-  ...
-/partitions.csv
-LICENSE
-README.md
+# Enter the container
+docker compose exec esp-idf bash
 ```
 
-## Roadmap TODO
+### 3. Build and Flash
+
+Inside the container:
+
+```bash
+# Configure target (e.g., ESP32-S3)
+idf.py set-target esp32s3
+
+# Build the project
+idf.py build
+
+# Flash to device (after USB setup - see full README-DIST.md)
+idf.py flash
+
+# Monitor serial output
+idf.py monitor
+```
+
+Press `Ctrl+]` to exit the monitor.
+
+## Project Structure
+
+```
+project-root-folder/
+└── your-project-name/     # Your ESP-IDF project folder
+    ├── main/
+    ├── CMakeLists.txt
+    └── ...
+```
+
+Copy your entire ESP-IDF project folder (not just files) into `project-root-folder/`, then set `PROJECT_NAME` in `.env` to match your folder name.
+
+For complete documentation, see [README-DIST.md](README-DIST.md).
 
 ## License
 
 MIT License (OSS edition).
 Pro edition available under commercial license.
+
+## Trademarks
+
+ESP-IDF and ESP32 are trademarks of Espressif Systems. This project is not affiliated with or endorsed by Espressif.

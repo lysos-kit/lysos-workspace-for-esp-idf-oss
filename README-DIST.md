@@ -1,8 +1,8 @@
-# ESP32 Starter Kit OSS
+# Lysos Workspace for ESP-IDF
 
-A production-ready, Dockerized ESP32 development environment powered by ESP-IDF. This starter kit eliminates the common pain points of ESP32 development by providing an isolated, versioned, and reproducible build environment.
+A clean, isolated ESP-IDF environment built for professional firmware teams. It removes setup pain, dependency conflicts, and version issues. Drop in your project, choose the IDF version, and everything just works.
 
-## Why Use This Starter?
+## Why Use This Workspace?
 
 - **No Python Conflicts**: ESP-IDF runs in an isolated Docker container
 - **Version Locked**: Pin specific ESP-IDF versions per project
@@ -35,10 +35,10 @@ A production-ready, Dockerized ESP32 development environment powered by ESP-IDF.
 
 ```bash
 # Extract the package
-unzip esp32-starter-oss-v*.zip
+unzip lysos-workspace-v*.zip
 
 # Navigate to the extracted directory
-cd esp32-starter-oss-v*
+cd lysos-workspace-v*
 
 # Copy environment template
 cp .env.example .env
@@ -156,7 +156,7 @@ docker compose restart
 ## Project Structure
 
 ```
-esp32-starter-oss-v*/
+lysos-workspace-v*/
 ├── docker-compose.yml         # Docker orchestration
 ├── Dockerfile                 # ESP-IDF container definition
 ├── .env.example               # Environment variables template
@@ -392,8 +392,8 @@ Build cache is automatically stored in Docker volumes:
 To clear cache:
 
 ```bash
-docker volume rm esp32-starter-oss_espidf-cargo-cache
-docker volume rm esp32-starter-oss_espidf-ccache-cache
+docker volume rm lysos-workspace_espidf-cargo-cache
+docker volume rm lysos-workspace_espidf-ccache-cache
 ```
 
 ## Support and Resources
@@ -405,3 +405,7 @@ docker volume rm esp32-starter-oss_espidf-ccache-cache
 ## License
 
 MIT License - See LICENSE file for details.
+
+## Trademarks
+
+ESP-IDF and ESP32 are trademarks of Espressif Systems. This project is not affiliated with or endorsed by Espressif.
