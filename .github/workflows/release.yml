@@ -73,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_version.outputs.tag }}
-          name: Lysos Workspace for ESP-IDF ${{ steps.get_version.outputs.tag }}
+          name: ${{ steps.get_version.outputs.tag }}
           draft: false
           prerelease: false
           generate_release_notes: true
