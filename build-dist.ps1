@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Build distribution package for ESP32 Starter OSS
+    Build distribution package for Lysos Workspace for ESP-IDF
 
 .DESCRIPTION
     Creates a distributable ZIP archive containing essential project files
@@ -14,7 +14,7 @@
 
 .EXAMPLE
     .\build-dist.ps1 -Version "1.0.0"
-    Creates esp32-starter-oss-v1.0.0.zip
+    Creates lysos-workspace-v1.0.0.zip
 
 .EXAMPLE
     .\build-dist.ps1
@@ -54,7 +54,7 @@ if (-not $Version) {
 
 # Project root directory
 $ProjectRoot = $PSScriptRoot
-$PackageName = "esp32-starter-oss"
+$PackageName = "lysos-workspace"
 $DistDir = Join-Path $ProjectRoot "dist"
 $TempDir = Join-Path $ProjectRoot "temp-dist-$([guid]::NewGuid().ToString().Substring(0,8))"
 $VersionedFolderName = "$PackageName-v$Version"
@@ -64,7 +64,7 @@ $ZipFileName = "$PackageName-v$Version.zip"
 $ZipFilePath = Join-Path $DistDir $ZipFileName
 
 Write-Host "`n========================================" -ForegroundColor Cyan
-Write-Host "ESP32 Starter OSS - Build Distribution" -ForegroundColor Cyan
+Write-Host "Lysos Workspace - Build Distribution" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Version: $Version" -ForegroundColor White
 Write-Host "Package: $ZipFileName" -ForegroundColor White

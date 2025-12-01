@@ -33,7 +33,7 @@ jobs:
       - name: Verify package was created
         run: |
           ls -lh dist/
-          if [ ! -f "dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip" ]; then
+          if [ ! -f "dist/lysos-workspace-v${{ steps.get_version.outputs.version }}.zip" ]; then
             echo "Error: Distribution package not found!"
             exit 1
           fi
@@ -41,8 +41,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: esp32-starter-oss-v${{ steps.get_version.outputs.version }}
-          path: dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip
+          name: lysos-workspace-v${{ steps.get_version.outputs.version }}
+          path: dist/lysos-workspace-v${{ steps.get_version.outputs.version }}.zip
           retention-days: 90
 
   create-release:
@@ -66,18 +66,18 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: esp32-starter-oss-v${{ steps.get_version.outputs.version }}
+          name: lysos-workspace-v${{ steps.get_version.outputs.version }}
           path: dist/
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.get_version.outputs.tag }}
-          name: ESP32 Starter OSS ${{ steps.get_version.outputs.tag }}
+          name: Lysos Workspace for ESP-IDF ${{ steps.get_version.outputs.tag }}
           draft: false
           prerelease: false
           generate_release_notes: true
           files: |
-            dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip
+            dist/lysos-workspace-v${{ steps.get_version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

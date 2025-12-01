@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Build distribution package for ESP32 Starter OSS
+# Build distribution package for Lysos Workspace for ESP-IDF
 #
 # Usage:
 #   ./build-dist.sh [version]
@@ -39,7 +39,7 @@ fi
 
 # Project root directory
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PACKAGE_NAME="esp32-starter-oss"
+PACKAGE_NAME="lysos-workspace"
 DIST_DIR="$PROJECT_ROOT/dist"
 TEMP_DIR="$PROJECT_ROOT/temp-dist-$(date +%s)"
 VERSIONED_FOLDER_NAME="$PACKAGE_NAME-v$VERSION"
@@ -50,7 +50,7 @@ ZIP_FILEPATH="$DIST_DIR/$ZIP_FILENAME"
 
 echo ""
 echo -e "${CYAN}========================================${NC}"
-echo -e "${CYAN}ESP32 Starter OSS - Build Distribution${NC}"
+echo -e "${CYAN}Lysos Workspace - Build Distribution${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo -e "${WHITE}Version: $VERSION${NC}"
 echo -e "${WHITE}Package: $ZIP_FILENAME${NC}"
