@@ -62,9 +62,16 @@ Write-Host ""
 Write-Host "Running: $command" -ForegroundColor Cyan
 Write-Host ""
 
+# Change to parent directory (where docker-compose.yml is located)
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectDir = Split-Path -Parent $scriptDir
+Push-Location $projectDir
+
 # Execute command inside the Docker container
 # Using bash -i -c ensures the ESP-IDF environment is loaded
 docker compose exec esp-idf bash -i -c "$command"
+
+Pop-Location
 
 $exitCode = $LASTEXITCODE
 

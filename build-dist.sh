@@ -42,7 +42,9 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PACKAGE_NAME="esp32-starter-oss"
 DIST_DIR="$PROJECT_ROOT/dist"
 TEMP_DIR="$PROJECT_ROOT/temp-dist-$(date +%s)"
-STAGING_DIR="$TEMP_DIR/$PACKAGE_NAME-v$VERSION"
+VERSIONED_FOLDER_NAME="$PACKAGE_NAME-v$VERSION"
+STAGING_DIR="$TEMP_DIR/$VERSIONED_FOLDER_NAME"
+PROJECT_ROOT_FOLDER="$STAGING_DIR/project-root-folder"
 ZIP_FILENAME="$PACKAGE_NAME-v$VERSION.zip"
 ZIP_FILEPATH="$DIST_DIR/$ZIP_FILENAME"
 
@@ -58,7 +60,9 @@ echo ""
 echo -e "${CYAN}[1/6] Creating directories...${NC}"
 mkdir -p "$DIST_DIR"
 mkdir -p "$STAGING_DIR"
+mkdir -p "$PROJECT_ROOT_FOLDER"
 echo -e "${GRAY}      Created: $STAGING_DIR${NC}"
+echo -e "${GRAY}      Created: $PROJECT_ROOT_FOLDER${NC}"
 
 # Copy essential files
 echo -e "${CYAN}[2/6] Copying project files...${NC}"
@@ -67,7 +71,6 @@ ROOT_FILES=(
     "docker-compose.yml"
     "Dockerfile"
     "LICENSE"
-    "sdkconfig.defaults"
     ".env.example"
 )
 
@@ -80,12 +83,6 @@ for file in "${ROOT_FILES[@]}"; do
         echo -e "${YELLOW}      x $file (not found, skipping)${NC}"
     fi
 done
-
-# Copy CMakeLists.txt as .example
-if [ -f "$PROJECT_ROOT/CMakeLists.txt" ]; then
-    cp "$PROJECT_ROOT/CMakeLists.txt" "$STAGING_DIR/CMakeLists.txt.example"
-    echo -e "${GRAY}      * CMakeLists.txt -> CMakeLists.txt.example${NC}"
-fi
 
 # Copy README-DIST.md and rename to README.md
 if [ -f "$PROJECT_ROOT/README-DIST.md" ]; then
@@ -106,29 +103,52 @@ else
     echo -e "${YELLOW}      x scripts/ (not found, skipping)${NC}"
 fi
 
-# Copy main directory
-echo -e "${CYAN}[4/6] Copying main directory...${NC}"
-if [ -d "$PROJECT_ROOT/main" ]; then
-    mkdir -p "$STAGING_DIR/main"
-    
-    if [ -f "$PROJECT_ROOT/main/.gitkeep" ]; then
-        cp "$PROJECT_ROOT/main/.gitkeep" "$STAGING_DIR/main/"
-        echo -e "${GRAY}      * main/.gitkeep${NC}"
-    fi
-    
-    if [ -f "$PROJECT_ROOT/main/CMakeLists.txt" ]; then
-        cp "$PROJECT_ROOT/main/CMakeLists.txt" "$STAGING_DIR/main/CMakeLists.txt.example"
-        echo -e "${GRAY}      * main/CMakeLists.txt -> main/CMakeLists.txt.example${NC}"
-    fi
-    
-    if [ -f "$PROJECT_ROOT/main/main.c" ]; then
-        cp "$PROJECT_ROOT/main/main.c" "$STAGING_DIR/main/main.c.example"
-        echo -e "${GRAY}      * main/main.c -> main/main.c.example${NC}"
-    fi
-else
-    echo -e "${YELLOW}      x main/ (not found, creating empty directory)${NC}"
-    mkdir -p "$STAGING_DIR/main"
-fi
+# Create a placeholder README in project-root-folder
+echo -e "${CYAN}[4/6] Creating project-root-folder...${NC}"
+cat > "$PROJECT_ROOT_FOLDER/README.md" << 'EOF'
+# Your ESP-IDF Project Goes Here
+
+Copy your entire ESP-IDF project folder into this directory (not just the contents, the whole folder).
+
+## Quick Start
+
+1. Copy your project folder here:
+   ```bash
+   cp -r /path/to/my-esp32-project ./project-root-folder/
+   ```
+   
+   Result structure:
+   ```
+   project-root-folder/
+   └── my-esp32-project/  ← your project folder
+       ├── main/
+       ├── CMakeLists.txt
+       └── ...
+   ```
+
+2. Edit .env and set PROJECT_NAME to your folder name:
+   ```bash
+   cd ..
+   cp .env.example .env
+   # Edit .env and set: PROJECT_NAME=my-esp32-project
+   ```
+
+3. Start Docker:
+   ```bash
+   docker compose up -d
+   docker compose exec esp-idf bash
+   ```
+
+4. Inside the container, build your project:
+   ```bash
+   idf.py set-target esp32s3
+   idf.py build
+   idf.py flash monitor
+   ```
+
+See the main README.md in the parent directory for complete documentation.
+EOF
+echo -e "${GRAY}      * project-root-folder/README.md (placeholder)${NC}"
 
 # Create ZIP archive
 echo -e "${CYAN}[5/6] Creating ZIP archive...${NC}"
@@ -137,7 +157,7 @@ if [ -f "$ZIP_FILEPATH" ]; then
     echo -e "${GRAY}      Removed existing: $ZIP_FILENAME${NC}"
 fi
 
-(cd "$TEMP_DIR" && zip -r "$ZIP_FILEPATH" "$PACKAGE_NAME-v$VERSION" -q)
+(cd "$TEMP_DIR" && zip -r "$ZIP_FILEPATH" * -q)
 echo -e "${GRAY}      * Created: $ZIP_FILENAME${NC}"
 
 FILE_SIZE=$(du -h "$ZIP_FILEPATH" | cut -f1)

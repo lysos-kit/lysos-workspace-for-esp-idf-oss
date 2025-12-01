@@ -1,0 +1,83 @@
+name: Build and Release Distribution Package
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-distribution:
+    name: Build Distribution Package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Install zip utility
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      - name: Build distribution package
+        run: |
+          chmod +x ./build-dist.sh
+          ./build-dist.sh ${{ steps.get_version.outputs.version }}
+
+      - name: Verify package was created
+        run: |
+          ls -lh dist/
+          if [ ! -f "dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip" ]; then
+            echo "Error: Distribution package not found!"
+            exit 1
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: esp32-starter-oss-v${{ steps.get_version.outputs.version }}
+          path: dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip
+          retention-days: 90
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-distribution
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: esp32-starter-oss-v${{ steps.get_version.outputs.version }}
+          path: dist/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: ESP32 Starter OSS ${{ steps.get_version.outputs.tag }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/esp32-starter-oss-v${{ steps.get_version.outputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

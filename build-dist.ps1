@@ -57,7 +57,9 @@ $ProjectRoot = $PSScriptRoot
 $PackageName = "esp32-starter-oss"
 $DistDir = Join-Path $ProjectRoot "dist"
 $TempDir = Join-Path $ProjectRoot "temp-dist-$([guid]::NewGuid().ToString().Substring(0,8))"
-$StagingDir = Join-Path $TempDir "$PackageName-v$Version"
+$VersionedFolderName = "$PackageName-v$Version"
+$StagingDir = Join-Path $TempDir $VersionedFolderName
+$ProjectRootFolder = Join-Path $StagingDir "project-root-folder"
 $ZipFileName = "$PackageName-v$Version.zip"
 $ZipFilePath = Join-Path $DistDir $ZipFileName
 
@@ -72,7 +74,9 @@ Write-Host ""
 Write-Host "[1/6] Creating directories..." -ForegroundColor Cyan
 New-Item -ItemType Directory -Path $DistDir -Force | Out-Null
 New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
+New-Item -ItemType Directory -Path $ProjectRootFolder -Force | Out-Null
 Write-Host "      Created: $StagingDir" -ForegroundColor Gray
+Write-Host "      Created: $ProjectRootFolder" -ForegroundColor Gray
 
 # Copy essential files
 Write-Host "[2/6] Copying project files..." -ForegroundColor Cyan
@@ -82,7 +86,6 @@ $rootFiles = @(
     "docker-compose.yml",
     "Dockerfile",
     "LICENSE",
-    "sdkconfig.defaults",
     ".env.example"
 )
 
@@ -94,13 +97,6 @@ foreach ($file in $rootFiles) {
     } else {
         Write-Host "      x $file (not found, skipping)" -ForegroundColor Yellow
     }
-}
-
-# Copy CMakeLists.txt as .example
-$cmakeRoot = Join-Path $ProjectRoot "CMakeLists.txt"
-if (Test-Path $cmakeRoot) {
-    Copy-Item -Path $cmakeRoot -Destination (Join-Path $StagingDir "CMakeLists.txt.example") -Force
-    Write-Host "      * CMakeLists.txt -> CMakeLists.txt.example" -ForegroundColor Gray
 }
 
 # Copy README-DIST.md and rename to README.md
@@ -124,37 +120,54 @@ if (Test-Path $scriptsSource) {
     Write-Host "      x scripts/ (not found, skipping)" -ForegroundColor Yellow
 }
 
-# Copy main directory
-Write-Host "[4/6] Copying main directory..." -ForegroundColor Cyan
-$mainSource = Join-Path $ProjectRoot "main"
-$mainDestination = Join-Path $StagingDir "main"
-if (Test-Path $mainSource) {
-    New-Item -ItemType Directory -Path $mainDestination -Force | Out-Null
-    
-    # Copy .gitkeep if exists
-    $gitkeep = Join-Path $mainSource ".gitkeep"
-    if (Test-Path $gitkeep) {
-        Copy-Item -Path $gitkeep -Destination $mainDestination -Force
-        Write-Host "      * main/.gitkeep" -ForegroundColor Gray
-    }
-    
-    # Copy CMakeLists.txt as .example
-    $mainCMake = Join-Path $mainSource "CMakeLists.txt"
-    if (Test-Path $mainCMake) {
-        Copy-Item -Path $mainCMake -Destination (Join-Path $mainDestination "CMakeLists.txt.example") -Force
-        Write-Host "      * main/CMakeLists.txt -> main/CMakeLists.txt.example" -ForegroundColor Gray
-    }
-    
-    # Copy main.c as .example
-    $mainC = Join-Path $mainSource "main.c"
-    if (Test-Path $mainC) {
-        Copy-Item -Path $mainC -Destination (Join-Path $mainDestination "main.c.example") -Force
-        Write-Host "      * main/main.c -> main/main.c.example" -ForegroundColor Gray
-    }
-} else {
-    Write-Host "      x main/ (not found, creating empty directory)" -ForegroundColor Yellow
-    New-Item -ItemType Directory -Path $mainDestination -Force | Out-Null
-}
+# Create a placeholder README in project-root-folder
+Write-Host "[4/6] Creating project-root-folder..." -ForegroundColor Cyan
+$projectReadmeContent = @"
+# Your ESP-IDF Project Goes Here
+
+Copy your entire ESP-IDF project folder into this directory (not just the contents, the whole folder).
+
+## Quick Start
+
+1. Copy your project folder here:
+   ``````bash
+   cp -r /path/to/my-esp32-project ./project-root-folder/
+   ``````
+   
+   Result structure:
+   ``````
+   project-root-folder/
+   └── my-esp32-project/  ← your project folder
+       ├── main/
+       ├── CMakeLists.txt
+       └── ...
+   ``````
+
+2. Edit .env and set PROJECT_NAME to your folder name:
+   ``````bash
+   cd ..
+   cp .env.example .env
+   # Edit .env and set: PROJECT_NAME=my-esp32-project
+   ``````
+
+3. Start Docker:
+   ``````bash
+   docker compose up -d
+   docker compose exec esp-idf bash
+   ``````
+
+4. Inside the container, build your project:
+   ``````bash
+   idf.py set-target esp32s3
+   idf.py build
+   idf.py flash monitor
+   ``````
+
+See the main README.md in the parent directory for complete documentation.
+"@
+$projectReadmePath = Join-Path $ProjectRootFolder "README.md"
+Set-Content -Path $projectReadmePath -Value $projectReadmeContent -Force
+Write-Host "      * project-root-folder/README.md (placeholder)" -ForegroundColor Gray
 
 # Create ZIP archive
 Write-Host "[5/6] Creating ZIP archive..." -ForegroundColor Cyan

@@ -72,6 +72,11 @@ echo ""
 echo -e "${CYAN}Running: ${COMMAND}${NC}"
 echo ""
 
+# Change to parent directory (where docker-compose.yml is located)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+cd "$PROJECT_DIR"
+
 # Execute command inside the Docker container
 # Using bash -i -c ensures the ESP-IDF environment is loaded
 docker compose exec esp-idf bash -i -c "$COMMAND"

@@ -31,11 +31,14 @@ A production-ready, Dockerized ESP32 development environment powered by ESP-IDF.
 
 ## Quick Start
 
-### 1. Clone and Configure
+### 1. Extract and Set Up
 
 ```bash
-# Clone or extract this project
-cd esp32-starter-oss
+# Extract the package
+unzip esp32-starter-oss-v*.zip
+
+# Navigate to the extracted directory
+cd esp32-starter-oss-v*
 
 # Copy environment template
 cp .env.example .env
@@ -43,7 +46,25 @@ cp .env.example .env
 # Edit .env if needed (optional - defaults work for most setups)
 ```
 
-### 2. Start the Docker Environment
+### 2. Set Up Your Project
+
+```bash
+# Copy your entire ESP-IDF project folder into project-root-folder
+cp -r /path/to/your/my-esp32-project ./project-root-folder/
+
+# Result structure:
+# project-root-folder/
+# └── my-esp32-project/  ← your project
+#     ├── main/
+#     ├── CMakeLists.txt
+#     └── ...
+
+# Edit .env to set your project folder name
+nano .env  # or use your favorite editor
+# Set: PROJECT_NAME=my-esp32-project
+```
+
+### 3. Start the Docker Environment
 
 ```bash
 # Build and start the container
@@ -53,7 +74,7 @@ docker compose up -d
 docker compose exec esp-idf bash
 ```
 
-### 3. Build Your Project
+### 4. Build and Flash Your Project
 
 Inside the container:
 
@@ -135,34 +156,44 @@ docker compose restart
 ## Project Structure
 
 ```
-esp32-starter-oss/
-├── main/                      # Your application code
-│   ├── CMakeLists.txt.example # Build configuration example
-│   └── main.c.example         # Main application example
-├── CMakeLists.txt.example     # Project build configuration example
-├── sdkconfig.defaults         # ESP-IDF default configuration
+esp32-starter-oss-v*/
 ├── docker-compose.yml         # Docker orchestration
 ├── Dockerfile                 # ESP-IDF container definition
 ├── .env.example               # Environment variables template
-└── scripts/                   # Helper scripts
-    ├── usb-*.ps1             # Windows USB management
-    ├── run.ps1               # Windows runner
-    └── run.sh                # Linux/macOS runner
+├── README.md                  # This file
+├── scripts/                   # Helper scripts
+│   ├── usb-*.ps1             # Windows USB management
+│   ├── run.ps1               # Windows runner
+│   └── run.sh                # Linux/macOS runner
+└── project-root-folder/       # COPY YOUR PROJECT FOLDER HERE
+    └── (your-project-name)/   # Your ESP-IDF project folder
+        ├── main/
+        ├── CMakeLists.txt
+        └── ...
 ```
 
-### Getting Started with Code
+### About project-root-folder
 
-1. Copy example files to start your project:
+The `project-root-folder` is where you copy your entire ESP-IDF project folder (not just the files, but the whole folder). This keeps Docker configuration separate from your code and allows proper container naming.
 
-   ```bash
-   cp CMakeLists.txt.example CMakeLists.txt
-   cp main/CMakeLists.txt.example main/CMakeLists.txt
-   cp main/main.c.example main/main.c
-   ```
+**Structure Example:**
 
-2. Edit `main/main.c` to implement your application logic
+If your project is called `remote-node-zero`:
 
-3. Build and flash as shown in Quick Start
+```
+project-root-folder/
+└── remote-node-zero/          ← your project folder
+    ├── main/
+    │   └── main.c
+    ├── CMakeLists.txt
+    └── ...
+```
+
+**Setup:**
+
+1. Copy your project: `cp -r /path/to/remote-node-zero ./project-root-folder/`
+2. Edit `.env` and set `PROJECT_NAME=remote-node-zero`
+3. Docker will mount `./project-root-folder/remote-node-zero` as `/workspace`
 
 ## Common Commands
 
@@ -228,6 +259,9 @@ docker compose exec esp-idf bash -i -c "idf.py --version"
 The `.env` file controls build and runtime configuration:
 
 ```ini
+# Your project folder name inside project-root-folder/
+PROJECT_NAME=my-esp32-project
+
 # ESP-IDF version (matches Docker image tag)
 ESPIDF_IMAGE_VERSION=v5.5.1
 
@@ -243,6 +277,8 @@ MONITORBAUD=115200
 IDF_CCACHE_ENABLE=1
 CMAKE_BUILD_TYPE=Release
 ```
+
+**Important:** Make sure `PROJECT_NAME` matches your project folder name in `project-root-folder/`!
 
 ### Switching ESP-IDF Versions
 
@@ -308,6 +344,28 @@ docker compose up -d --build --force-recreate
 ```
 
 ## Advanced Usage
+
+### Using Your Own ESP-IDF Project
+
+Copy your entire project folder into `project-root-folder/`:
+
+```bash
+# Copy your project folder (not just its contents!)
+cp -r /path/to/my-esp32-project ./project-root-folder/
+
+# Update .env with your project folder name
+echo "PROJECT_NAME=my-esp32-project" >> .env
+```
+
+**Alternative: Use a symlink**
+
+```bash
+# Create a symlink to your project
+ln -s /path/to/my-esp32-project ./project-root-folder/my-esp32-project
+
+# Update .env
+echo "PROJECT_NAME=my-esp32-project" >> .env
+```
 
 ### Multiple Serial Ports
 
