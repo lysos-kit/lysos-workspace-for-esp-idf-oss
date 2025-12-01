@@ -12,6 +12,11 @@ The utility for this is called "usbipd".
 
 ## How To Connect ESP32 Programmer To The Container
 
+- on linux/mac host, it should be directly available
+- on windows host machine, we must create a bridge from Windows to the container
+
+### Bridging Windows USB Port To The Container
+
 - first, you must plug in the programmer to the computer via USB
 - then, you must list the USB device and get its "BUSID" - run command `usbipd list` on the Windows host
 - you get an output like this:
@@ -67,9 +72,16 @@ usbipd: info: Using IP address 172.28.208.1 to reach the host.
 
 ## idf.py Commands
 
+### Recommended: Work inside the container
+
 - Enter the container: `docker compose exec esp-idf bash`
-- Then run commands normally:
-  - monitor - `idf.py monitor` - exit by sending CTRL+]
+- Then run commands normally (idf.py is available):
+  - version - `idf.py --version`
+  - monitor - `idf.py monitor` - exit by pressing CTRL+]
   - flash - `idf.py flash`
   - build - `idf.py build`
   - menuconfig - `idf.py menuconfig`
+
+### Alternative: Run one-off commands from outside
+
+- For non-interactive commands: `docker compose exec esp-idf bash -i -c "idf.py build"`
