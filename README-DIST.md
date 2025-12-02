@@ -6,28 +6,85 @@ A clean, isolated ESP-IDF environment built for professional firmware teams. It 
 
 - **No Python Conflicts**: ESP-IDF runs in an isolated Docker container
 - **Version Locked**: Pin specific ESP-IDF versions per project
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Cross-Platform**: Works on Windows and Linux (macOS NOT tested yet)
 - **USB Passthrough**: Full hardware debugging and flashing support
 - **Production Ready**: Includes safe defaults and best practices
 
 ## Prerequisites
 
-### Required Software
-
-- **Docker Desktop** (Windows/Mac) or **Docker Engine** (Linux)
-- **WSL2** (Windows only)
-- **Git**
-
-### Windows-Specific Requirements
-
-- **usbipd-win**: For USB device passthrough to WSL2
-  - Install via: `winget install --interactive --exact dorssel.usbipd-win`
-  - Allows ESP32 programmer access from within Docker
-
 ### Hardware
 
 - ESP32 development board (ESP32, ESP32-S2, ESP32-S3, ESP32-C3, etc.)
 - USB programmer/debugger (often built into dev boards or ESPPROG)
+
+This whole system was tested with the original ESPProg programmer and ESP32-S3-WROOM-1 microcontroller.
+
+It SHOULD easily support any other programming tool on USB that is supported by ESP-IDF framework.
+
+### Required Software
+
+- **Docker Desktop** (Windows/Mac) or **Docker Engine** (Linux)
+- **WSL2** (Windows only)
+- **USBIPD** (Windows only)
+- **docker compose (v2)** (Linux)
+- **Git**
+
+#### Linux
+
+On Linux, you need to install Docker and docker-compose (version 2!).
+
+That docker-compose MUST be version 2, not the legacy version 1.
+
+To test if you have installed the right docker compose version,
+try running:
+
+```bash
+docker compose
+```
+
+(notice there's NO "-" dash between the words!)
+
+"docker compose" = v2
+"docker-compose" = v1
+
+You need the command without the dash installed, that's the docker compose v2.
+
+#### Windows
+
+On Windows, you'll need a few more things...
+
+Install Docker Desktop - this will also install the latest docker compose (v2).
+
+IMPORTANT!
+
+Windows ALSO requires bridging USB devices from the host (your machine) to Docker.
+
+By default, when you start a Docker container on Windows,
+the container does NOT see your USB devices connected to your host computer.
+
+If you plug your ESPPROG to your PC, it won't suddenly appear INSIDE our Docker container
+and it cannot be used just like that to communicate with your programmer.
+
+To make it appear inside, so that idf.py and other tools can use your programmer, we must do
+a few steps...
+
+##### Install USBIPD Tool
+
+To be able to connect your USB device from Windows to the Docker container,
+we need a special tool for Windows - USBIPD.
+
+Install the USBIPD via Windows' package manager:
+
+```powershell
+winget install --interactive --exact dorssel.usbipd-win
+```
+
+This MIGHT require admin privileges.
+
+In case the setup hangs or fails, try to rebooting your computer and running again.
+
+With this tool installed, you are ready to rock 'n roll on Windows!
+
 
 ## Quick Start
 
@@ -43,8 +100,168 @@ cd lysos-workspace-v*
 # Copy environment template
 cp .env.example .env
 
-# Edit .env if needed (optional - defaults work for most setups)
+# IMPORTANT!
+# Edit .env - some parameters inside MUST BE set before continuing!
 ```
+
+#### Linux
+
+On Linux, your USB programmer device will be immediately available as `/dev/ttyUSB0`, `/dev/ttyUSB1` or similar (2, 3, etc...)
+
+You can see your USB devices available by going to /dev on your Linux host machine and
+checking which ones are available like this:
+
+```bash
+cd /dev
+ll
+```
+
+Open your .env file and set the ESPPROG variable to `/dev/ttyUSB0` or similar.
+
+If you are setting USB port number HIGHER THAN 1 - like 2, 3, etc... see the "Multiple Serial Ports" section down below as well - MANDATORY!
+
+Some programmers like ESPProg have TWO ports...
+
+Pick USB1 for start and if it won't work, we switch to USB0...
+
+
+#### Windows
+
+On Windows, once you have the container running,
+we must bridge the USB device to the Docker container.
+
+We use that USBIPD tools we installed previously for that.
+
+Go to "scripts" directory:
+
+```bash
+cd scripts
+```
+
+Now.
+
+Each device (your USB programmer) in a SPECIFIC USB port must be BOUND to the Docker container only ONCE.
+
+It's a one-time setup. After that, you don't need to bind anymore.
+
+So you plug in your USB programmer to ANY usb port.
+
+Then we list the USB devices available.
+
+##### Step 1: Find Your Device
+
+```powershell
+# List connected USB devices
+cd scripts
+.\usb-list.ps1
+```
+
+Example output:
+
+```
+BUSID  VID:PID    DEVICE                              STATE
+1-2    0403:6010  USB Serial Converter A              Not shared
+```
+
+"Not shared" means it has NOT been bound to the Docker yet.
+
+Note the **BUSID** (e.g., `1-2`) of your ESP32 programmer.
+
+##### Step 2: Share the Device (One-Time Setup)
+
+```powershell
+# Share device with Docker
+.\usb-bind.ps1 --busid 1-2
+```
+
+This will configure the device so that it can be bridged into the Docker.
+
+This is a one time setup step per device per USB port.
+
+If you switch your programmer to ANOTHER USB port and run list again,
+it will show as a DIFFERENT "device" with a DIFFERENT "BUSID".
+
+You will have to bind that one as well.
+
+If you're working on a laptop with say 2 USB ports,
+I recommend plugging the device into one after another and
+doing this bind FOR BOTH - so that you can use any port you want later.
+
+After completing these "BIND" operations, YOU MUST restart your Docker
+container to pick up the new USB ports.
+
+If you DON'T, you won't see them inside Docker.
+
+```powershell
+cd ..
+docker compose restart
+```
+
+
+##### Step 3: Attach the Device
+
+This will make the USB device available inside Docker
+AND - UNAVAILABLE in Windows!
+
+The access is EXCLUSIVE, so it's either inside Windows, or inside Docker,
+never in both.
+
+This "ATTACH" command is required EVERY TIME you plug the device in.
+
+If you unplug your programmer and the re-plug,
+you MUST run it again, so that it once again becomes
+available in Docker.
+
+```powershell
+# Attach to Docker (required each time you plug in the device)
+.\usb-attach.ps1 --busid 1-2
+
+# After attaching, restart the container to pick up the device
+# (might work right away without restart - so just to be sure)
+docker compose restart
+```
+
+NOW - and this is IMPORTANT!
+
+You go back and open your .env file...
+
+And set the USB_BUSID to your value like
+
+USB_BUSID=1-2
+
+or...
+
+USB_BUSID=3-1
+
+After this - we need to refresh the container again to pick up the
+changes in .env.
+
+```powershell
+docker compose up -d
+```
+
+And... That's it!
+
+These are the only rules...
+
+Every time you plug-in - run ATTACH.
+
+Running DETACH is optional - the device is detached when you remove it from
+your USB port.
+
+Running BIND - only once for each new device in a new USB port.
+
+**Scripts Included:**
+
+```powershell
+# Windows PowerShell scripts in ./scripts/
+.\scripts\usb-list.ps1      # List USB devices
+.\scripts\usb-bind.ps1      # Bind device to Docker (needed only once per device x usb port)
+.\scripts\usb-attach.ps1    # Attach device to Docker (needed after each plug in)
+.\scripts\usb-detach.ps1    # Detach device from Docker
+```
+
+
 
 ### 2. Set Up Your Project
 
@@ -61,7 +278,6 @@ cp -r /path/to/your/my-esp32-project ./project-root-folder/
 
 # Edit .env to set your project folder name
 nano .env  # or use your favorite editor
-# Set: PROJECT_NAME=my-esp32-project
 ```
 
 ### 3. Start the Docker Environment
@@ -69,9 +285,6 @@ nano .env  # or use your favorite editor
 ```bash
 # Build and start the container
 docker compose up -d
-
-# Enter the container
-docker compose exec esp-idf bash
 ```
 
 ### 4. Build and Flash Your Project
@@ -94,64 +307,8 @@ idf.py monitor
 
 Press `Ctrl+]` to exit the monitor.
 
-## USB Device Setup
 
-### Linux/macOS
 
-USB devices should be automatically available inside the container at `/dev/ttyUSB0` (or similar).
-
-### Windows (WSL2 Required)
-
-Windows requires bridging USB devices from the host to WSL2, then to Docker:
-
-#### Step 1: Find Your Device
-
-```powershell
-# List connected USB devices
-usbipd list
-```
-
-Example output:
-
-```
-BUSID  VID:PID    DEVICE                              STATE
-1-2    0403:6010  USB Serial Converter A              Not shared
-```
-
-Note the **BUSID** (e.g., `1-2`) of your ESP32 programmer.
-
-#### Step 2: Share the Device (One-Time Setup)
-
-```powershell
-# Share device with WSL2
-usbipd bind --busid 1-2
-```
-
-#### Step 3: Attach the Device
-
-```powershell
-# Attach to WSL2 (required each time you plug in the device)
-usbipd attach --wsl --busid 1-2
-
-# After attaching, restart the container to pick up the device
-docker compose restart
-```
-
-**Helper Scripts Included:**
-
-```powershell
-# Windows PowerShell scripts in ./scripts/
-.\scripts\usb-list.ps1      # List USB devices
-.\scripts\usb-bind.ps1      # Bind device to WSL2
-.\scripts\usb-attach.ps1    # Attach device to WSL2
-.\scripts\usb-detach.ps1    # Detach device from WSL2
-```
-
-**Important Notes:**
-
-- The USB device becomes **unavailable on Windows** when attached to WSL2 (exclusive access)
-- You must **reattach after unplugging** and replugging the device
-- You must **restart the Docker container** after attaching
 
 ## Project Structure
 
@@ -209,14 +366,27 @@ docker compose down
 # Restart container (needed after USB attach)
 docker compose restart
 
-# Enter container
+# Enter container (not really needed)
 docker compose exec esp-idf bash
 
 # View container logs
 docker compose logs -f
 ```
 
-### Inside the Container
+### Run Commands Easily
+
+```bash
+cd scripts
+# One-off commands (non-interactive)
+./run.sh idf.py build
+./run.sh idf.py --version
+```
+
+The run.sh is a shortcut script to run tools that are inside the container.
+
+### Inside the Container (NOT recommended)
+
+I recommend using the shortcut above ^^^ with the run.sh script.
 
 ```bash
 # Set target chip
@@ -244,51 +414,16 @@ idf.py fullclean
 idf.py --version
 ```
 
-### Run Commands from Outside Container
 
-```bash
-# One-off commands (non-interactive)
-docker compose exec esp-idf bash -i -c "idf.py build"
-docker compose exec esp-idf bash -i -c "idf.py --version"
-```
 
 ## Configuration
 
 ### Environment Variables (.env)
 
-The `.env` file controls build and runtime configuration:
+The `.env` file controls build and runtime configuration.
 
-```ini
-# Your project folder name inside project-root-folder/
-PROJECT_NAME=my-esp32-project
+Every time you make ANY change in the .env file, you MUST run:
 
-# ESP-IDF version (matches Docker image tag)
-ESPIDF_IMAGE_VERSION=v5.5.1
-
-# Target chip
-IDF_TARGET=esp32s3
-
-# Serial port configuration
-ESPPORT=/dev/ttyUSB0
-ESPBAUD=115200
-MONITORBAUD=115200
-
-# Build optimization
-IDF_CCACHE_ENABLE=1
-CMAKE_BUILD_TYPE=Release
-```
-
-**Important:** Make sure `PROJECT_NAME` matches your project folder name in `project-root-folder/`!
-
-### Switching ESP-IDF Versions
-
-Edit `.env` and change `ESPIDF_IMAGE_VERSION`:
-
-```ini
-ESPIDF_IMAGE_VERSION=v5.0.1  # or v5.1.2, v5.5.1, etc.
-```
-
-Then rebuild the container:
 
 ```bash
 docker compose down
@@ -301,24 +436,14 @@ docker compose up -d --build
 
 **Windows:**
 
-- Run `usbipd list` to verify device is attached
+- Run `usbipd list` to verify device is attached (scripts/usb-list.ps1)
 - Restart container: `docker compose restart`
 - Check WSL2 has device: `wsl ls -l /dev/ttyUSB*`
 
-**Linux/macOS:**
+**Linux**
 
 - Check permissions: `ls -l /dev/ttyUSB0`
-- Add user to dialout group: `sudo usermod -a -G dialout $USER`
 
-### Build Errors
-
-```bash
-# Clean and rebuild
-docker compose exec esp-idf bash -i -c "idf.py fullclean && idf.py build"
-
-# Check ESP-IDF version matches your target
-docker compose exec esp-idf bash -i -c "idf.py --version"
-```
 
 ### Port Access Denied
 
@@ -404,7 +529,9 @@ docker volume rm lysos-workspace_espidf-ccache-cache
 
 ## License
 
-MIT License - See LICENSE file for details.
+AGPLv3 License (OSS edition).
+
+Pro edition available under commercial license.
 
 ## Trademarks
 
