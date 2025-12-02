@@ -172,7 +172,7 @@ BUSID  VID:PID    DEVICE                              STATE
 Note the **BUSID** (e.g., `1-2`) of your ESP32 programmer.
 
 > [!WARNING]
-> If you cannot see your device in the usb list output, try to connecting it to an older USB port. On my PC, ESPProg is NOT listed in the list when connected to a USB3.1 3-meter-long cable, but it does work when I connect it WITHOUT the cable. If not listed, try removing long cable or use an older USB port.
+> If you cannot see your device in the usb list output, try to connecting it to an older USB port. On my PC, ESPProg is NOT listed in the list when connected to a USB3.1 3-meter-long cable, but it does work when I connect it WITHOUT the cable. If not listed, try removing long cables or use an older USB port.
 
 ##### Step 2: Share the Device (One-Time Setup)
 
