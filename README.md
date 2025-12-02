@@ -10,7 +10,7 @@ A clean, isolated ESP-IDF environment built for professional firmware teams. It 
 
 - **No Python Conflicts**: ESP-IDF runs in an isolated Docker container
 - **Version Locked**: Pin specific ESP-IDF versions per project
-- **Cross-Platform**: Works on Windows, macOS, and Linux
+- **Cross-Platform**: Works on Windows and Linux (macOS NOT tested yet)
 - **USB Passthrough**: Full hardware debugging and flashing support
 - **Production Ready**: Includes safe defaults and best practices
 
