@@ -1,6 +1,6 @@
 [![License](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/lysos-kit/lysos-workspace-for-esp-idf)](https://github.com/lysos-kit/lysos-workspace-for-esp-idf/releases/latest)
-[![Build](https://github.com/lysos-kit/lysos-workspace-for-esp-idf/actions/workflows/release.yml/badge.svg)](https://github.com/lysos-kit/lysos-workspace-for-esp-idf/actions/workflows/release.yml)
+[![Release Build](https://github.com/lysos-kit/lysos-workspace-for-esp-idf/actions/workflows/release.yml/badge.svg?event=push)](https://github.com/lysos-kit/lysos-workspace-for-esp-idf/actions/workflows/release.yml)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](#quick-start)
 
 # Lysos Workspace for ESP-IDF
