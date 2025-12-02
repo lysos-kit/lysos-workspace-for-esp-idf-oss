@@ -72,6 +72,7 @@ For complete documentation, see [README-DIST.md](README-DIST.md).
 ## License
 
 AGPLv3 License (OSS edition).
+
 Pro edition available under commercial license.
 
 ## Trademarks
