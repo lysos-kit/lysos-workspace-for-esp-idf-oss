@@ -247,7 +247,7 @@ These are the only rules...
 Every time you plug-in - run ATTACH.
 
 Running DETACH is optional - the device is detached when you remove it from
-your USB port.
+your USB port OR - if you need the device back in Windows, DETACH so that is it removed from Docker and made available in Windows.
 
 Running BIND - only once for each new device in a new USB port.
 
