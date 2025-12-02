@@ -118,7 +118,8 @@ ll
 
 Open your .env file and set the ESPPROG variable to `/dev/ttyUSB0` or similar.
 
-If you are setting USB port number HIGHER THAN 1 - like 2, 3, etc... see the "Multiple Serial Ports" section down below as well - MANDATORY!
+> [!NOTE]
+> If you are setting USB port number HIGHER THAN 1 - like 2, 3, etc... see the "Multiple Serial Ports" section down below as well - MANDATORY!
 
 Some programmers like ESPProg have TWO ports...
 
