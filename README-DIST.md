@@ -289,24 +289,46 @@ docker compose up -d
 
 ### 4. Build and Flash Your Project
 
-Inside the container:
+Go to the *scripts* folder to use a shortcut script **run.ps1** or **run.sh** that
+will make running tools super easy:
+
+#### Linux
 
 ```bash
+cd scripts
+
 # Configure target (ESP32-S3 by default)
-idf.py set-target esp32s3
+./run.sh idf.py set-target esp32s3
 
 # Build the project
-idf.py build
+./run.sh idf.py build
 
 # Flash to device (after USB setup - see below)
-idf.py flash
+./run.sh idf.py flash
 
 # Monitor serial output
-idf.py monitor
+./run.sh idf.py monitor
+```
+
+#### Windows
+
+```bash
+cd scripts
+
+# Configure target (ESP32-S3 by default)
+.\run.ps1 idf.py set-target esp32s3
+
+# Build the project
+.\run.ps1 idf.py build
+
+# Flash to device (after USB setup - see below)
+.\run.ps1 idf.py flash
+
+# Monitor serial output
+.\run.ps1 idf.py monitor
 ```
 
 Press `Ctrl+]` to exit the monitor.
-
 
 
 
@@ -382,13 +404,18 @@ cd scripts
 ./run.sh idf.py --version
 ```
 
-The run.sh is a shortcut script to run tools that are inside the container.
+The run.sh (for Linux) or run.ps1 (for Windows) is a shortcut script to run tools that are inside the container.
 
 ### Inside the Container (NOT recommended)
 
-I recommend using the shortcut above ^^^ with the run.sh script.
+I recommend using the shortcut above ^^^ with the run.sh/ps1 script.
+
+You first need to enter the container and then you can run ESP-IDF commands:
+
 
 ```bash
+docker compose exec esp-idf bash
+
 # Set target chip
 idf.py set-target esp32s3
 
