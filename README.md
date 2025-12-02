@@ -16,62 +16,59 @@ A clean, isolated ESP-IDF environment built for professional firmware teams. It 
 
 ## Quick Start
 
-### 1. Set Up
+### 1. Download The Release Package
+
+Download the latest release package that contains only the required files.
+
+### 2. Follow Our Quick Start Guide
+
+See [README-DIST.md](README-DIST.md).
+
+### 3. You Have A Complete ESP-IDF Environment Set Up
+
+...and be able to run commands like this:
+
+
+#### Linux
 
 ```bash
-# Copy environment template
-cp .env.example .env
+cd scripts
 
-# Copy your ESP-IDF project folder into project-root-folder
-cp -r /path/to/your/my-esp32-project ./project-root-folder/
-
-# Edit .env to set your project folder name
-nano .env  # Set: PROJECT_NAME=my-esp32-project
-```
-
-### 2. Start Docker Environment
-
-```bash
-# Build and start the container
-docker compose up -d
-
-# Enter the container
-docker compose exec esp-idf bash
-```
-
-### 3. Build and Flash
-
-Inside the container:
-
-```bash
-# Configure target (e.g., ESP32-S3)
-idf.py set-target esp32s3
+# Configure target (ESP32-S3 by default)
+./run.sh idf.py set-target esp32s3
 
 # Build the project
-idf.py build
+./run.sh idf.py build
 
-# Flash to device (after USB setup - see full README-DIST.md)
-idf.py flash
+# Flash to device (after USB setup - see below)
+./run.sh idf.py flash
 
 # Monitor serial output
-idf.py monitor
+./run.sh idf.py monitor
 ```
 
-Press `Ctrl+]` to exit the monitor.
+#### Windows
 
-## Project Structure
+```bash
+cd scripts
 
+# Configure target (ESP32-S3 by default)
+.\run.ps1 idf.py set-target esp32s3
+
+# Build the project
+.\run.ps1 idf.py build
+
+# Flash to device (after USB setup - see below)
+.\run.ps1 idf.py flash
+
+# Monitor serial output
+.\run.ps1 idf.py monitor
 ```
-project-root-folder/
-└── your-project-name/     # Your ESP-IDF project folder
-    ├── main/
-    ├── CMakeLists.txt
-    └── ...
-```
 
-Copy your entire ESP-IDF project folder (not just files) into `project-root-folder/`, then set `PROJECT_NAME` in `.env` to match your folder name.
+...and switch between ESP-IDF versions quickly just by changing the version number in the .env file...
 
-For complete documentation, see [README-DIST.md](README-DIST.md).
+Now download the release and then follow the guide above ^^^.
+
 
 ## License
 
