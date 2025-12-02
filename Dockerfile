@@ -21,6 +21,9 @@ WORKDIR /workspace
 # Set up ESP-IDF environment for root user (for interactive shells)
 RUN echo '. /opt/esp/idf/export.sh > /dev/null 2>&1' >> /root/.bashrc
 
+# Allow git to access the workspace directory
+RUN git config --system --add safe.directory /workspace
+
 # Keep container running and allow interactive shell
 CMD ["/bin/bash"]
 
