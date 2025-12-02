@@ -1,5 +1,4 @@
-![Version](https://img.shields.io/github/v/release/lysos-kit/lysos-workspace-for-esp-idf?color=green)
-
+![GitHub Release](https://img.shields.io/github/v/release/lysos-kit/lysos-workspace-for-esp-idf?label=Version&color=green)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](#quick-start)
 [![License](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 
