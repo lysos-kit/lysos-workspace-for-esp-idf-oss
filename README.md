@@ -1,5 +1,5 @@
+[![Version](https://img.shields.io/badge/version-v0.1.2-blue)](https://github.com/lysos-kit/lysos-workspace-for-esp-idf-oss/releases/latest)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](#quick-start)
-[![GitHub release](https://img.shields.io/github/v/release/lysos-kit/lysos-workspace-for-esp-idf-oss)](https://github.com/lysos-kit/lysos-workspace-for-esp-idf-oss/releases/latest)
 [![License](https://img.shields.io/badge/License-AGPLv3-blue.svg)](LICENSE)
 
 # Lysos Workspace for ESP-IDF
