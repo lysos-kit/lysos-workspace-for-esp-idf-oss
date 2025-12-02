@@ -83,7 +83,10 @@ This MIGHT require admin privileges.
 
 In case the setup hangs or fails, try to rebooting your computer and running again.
 
-With this tool installed, you are ready to rock 'n roll on Windows!
+> [!CAUTION]
+> After installing USBIPD, you MUST reboot your computer. Otherwise the tool might NOT get in PATH and our scripts will NOT be able to find the usbipd tool!
+
+With this tool installed and PC restarted, you are ready to rock 'n roll on Windows!
 
 
 ## Quick Start
@@ -118,7 +121,7 @@ ll
 
 Open your .env file and set the ESPPROG variable to `/dev/ttyUSB0` or similar.
 
-> [!NOTE]
+> [!IMPORTANT]
 > If you are setting USB port number HIGHER THAN 1 - like 2, 3, etc... see the "Multiple Serial Ports" section down below as well - MANDATORY!
 
 Some programmers like ESPProg have TWO ports...
@@ -168,6 +171,9 @@ BUSID  VID:PID    DEVICE                              STATE
 
 Note the **BUSID** (e.g., `1-2`) of your ESP32 programmer.
 
+> [!WARNING]
+> If you cannot see your device in the usb list output, try to connecting it to an older USB port. On my PC, ESPProg is NOT listed in the list when connected to a USB3.1 3-meter-long cable, but it does work when I connect it WITHOUT the cable. If not listed, try removing long cable or use an older USB port.
+
 ##### Step 2: Share the Device (One-Time Setup)
 
 ```powershell
@@ -177,7 +183,9 @@ Note the **BUSID** (e.g., `1-2`) of your ESP32 programmer.
 
 This will configure the device so that it can be bridged into the Docker.
 
-This is a one time setup step per device per USB port.
+This is a one time setup step per device per USB port and REQUIRES ADMIN PRIVILEGES - you MUST a new PowerShell terminal with Administrator rights.
+
+Next.
 
 If you switch your programmer to ANOTHER USB port and run list again,
 it will show as a DIFFERENT "device" with a DIFFERENT "BUSID".
